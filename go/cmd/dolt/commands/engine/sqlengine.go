@@ -258,39 +258,6 @@ func (se *SqlEngine) Analyze(ctx *sql.Context, n sql.Node) (sql.Node, error) {
 	return se.engine.Analyzer.Analyze(ctx, n, nil)
 }
 
-// TODO: All of this logic should be moved to the engine...
-func (se *SqlEngine) Dbddl(ctx *sql.Context, dbddl *sqlparser.DBDDL, query string) (sql.Schema, sql.RowIter, error) {
-	action := strings.ToLower(dbddl.Action)
-	var rowIter sql.RowIter = nil
-	var err error = nil
-
-	if action != sqlparser.CreateStr && action != sqlparser.DropStr {
-		return nil, nil, fmt.Errorf("Unhandled DBDDL action %v in Query %v", action, query)
-	}
-
-	if action == sqlparser.DropStr {
-		// Should not be allowed to delete repo name and information schema
-		if dbddl.DBName == sql.InformationSchemaDatabaseName {
-			return nil, nil, fmt.Errorf("DROP DATABASE isn't supported for database %s", sql.InformationSchemaDatabaseName)
-		}
-	}
-
-	sch, rowIter, err := se.Query(ctx, query)
-
-	if rowIter != nil {
-		err = rowIter.Close(ctx)
-		if err != nil {
-			return nil, nil, err
-		}
-	}
-
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return sch, nil, nil
-}
-
 func (se *SqlEngine) GetUnderlyingEngine() *gms.Engine {
 	return se.engine
 }

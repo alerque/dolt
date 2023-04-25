@@ -1143,8 +1143,6 @@ func processParsedQuery(ctx *sql.Context, query string, se *engine.SqlEngine, sq
 			return nil, nil, err
 		}
 		return nil, nil, nil
-	case *sqlparser.DBDDL:
-		return se.Dbddl(ctx, s, query)
 	case *sqlparser.Load:
 		if s.Local {
 			return nil, nil, fmt.Errorf("LOCAL supported only in sql-server mode")
